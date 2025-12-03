@@ -9,18 +9,16 @@ from langchain_core.output_parsers import StrOutputParser
 import os
 
 
-# CẤU HÌNH QDRANT
-QDRANT_URL = "http://qdrant.tructran-api.xyz/"  # Thay bằng địa chỉ server Qdrant của bạn
+QDRANT_URL = "http://54.179.170.44:6333/" 
 COLLECTION_NAME = "car_sales_data"
 
 data = pd.read_csv("cars.csv")
 df = pd.DataFrame(data)
 
-# Kỹ thuật quan trọng: Gộp các cột quan trọng thành một đoạn văn bản (Content)
-# Để khi tìm kiếm, AI hiểu được toàn bộ ngữ cảnh của chiếc xe đó
-df['page_content'] = df.apply(lambda x: f"Xe: {x['brand']} | Năm: {x['year']} | Giá: {x['price']} |  Mô tả: {x['description']}", axis=1)
 
-# --- BƯỚC 2: VECTOR HÓA & LƯU TRỮ (INDEXING) ---
+df['page_content'] = df.apply(lambda x: f"Xe: {x['brand']} có dòng {x['name']} được sản xuất năm: {x['year']} rao bán với giá: {x['price']} tại {x['location']}. Đây là {x['status']} và đã chạy được {x['mileage'] if x['mileage'] is not None else '0'} km   có {x['capacity']} ngồi có động cơ {x['engine']} được bán bởi {x['seller_name']} đây là  mô tả chi tiết của người bán: {x['description']}", axis=1)
+
+
 print("Đang nạp dữ liệu vào Vector DB...")
 
 # Load dữ liệu từ DataFrame vào LangChain Documents
@@ -32,7 +30,6 @@ embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 qdrant_client = QdrantClient(url=QDRANT_URL)
 print(f"DEBUG: QdrantClient version: {qdrant_client.__version__ if hasattr(qdrant_client, '__version__') else 'unknown'}")
 print(f"DEBUG: Has search: {hasattr(qdrant_client, 'search')}")
-# print(f"DEBUG: Dir: {dir(qdrant_client)}") # Uncomment if needed, but might be too verbose
 
 try:
     # 1. KIỂM TRA: Xem Collection đã tồn tại trên Server chưa
