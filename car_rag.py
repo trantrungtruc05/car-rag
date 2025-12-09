@@ -9,14 +9,15 @@ from langchain_core.output_parsers import StrOutputParser
 import os
 
 
-QDRANT_URL = "http://54.179.170.44:6333/" 
+
+QDRANT_URL = "http://47.129.184.129:6333/" 
 COLLECTION_NAME = "car_sales_data"
 
 data = pd.read_csv("cars.csv")
 df = pd.DataFrame(data)
 
 
-df['page_content'] = df.apply(lambda x: f"Xe: {x['brand']} có dòng {x['name']} được sản xuất năm: {x['year']} rao bán với giá: {x['price']} tại {x['location']}. Đây là {x['status']} và đã chạy được {x['mileage'] if x['mileage'] is not None else '0'} km   có {x['capacity']} ngồi có động cơ {x['engine']} được bán bởi {x['seller_name']} đây là  mô tả chi tiết của người bán: {x['description']}", axis=1)
+df['page_content'] = df.apply(lambda x: f"Xe {x['brand']} dòng {x['name']} được sản xuất năm: {x['year']} rao bán với giá: {x['price']} tại {x['location']}. Đây là {x['status']} và đã chạy được {x['mileage'] if x['mileage'] is not None else '0'} km   có {x['capacity']} ngồi có động cơ {x['engine']} được bán bởi {x['seller_name']}", axis=1)
 
 
 print("Đang nạp dữ liệu vào Vector DB...")
@@ -49,7 +50,7 @@ except Exception as e:
     
     # ⚠️ CHỈ CHẠY DÒNG NÀY MỘT LẦN KHI TẠO DỮ LIỆU BAN ĐẦU
     # Tạo collection thủ công để tránh lỗi tương thích thư viện và lỗi kết nối gRPC
-    qdrant_client.upsert(
+    qdrant_client.recreate_collection(
         collection_name=COLLECTION_NAME,
         vectors_config=models.VectorParams(size=1536, distance=models.Distance.COSINE)
     )
