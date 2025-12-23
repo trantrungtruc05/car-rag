@@ -1,6 +1,7 @@
 langchain
 langchain-community
 langchain-openai
+langchain-core
 faiss-cpu
 pandas
 qdrant-client==1.12.1
